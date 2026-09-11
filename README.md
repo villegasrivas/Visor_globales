@@ -25,6 +25,17 @@ Todas las herramientas generales quedan habilitadas en la plantilla base. Para o
 
 El botón **Capas** está a la izquierda, debajo del buscador. Las demás herramientas permanecen abajo a la derecha. Sus botones muestran una ayuda al mantener el cursor encima, también cuando el diseño responsivo oculta el texto.
 
+### Leyenda plegable
+
+La pestaña con flecha permite esconder la leyenda hacia la izquierda y recuperarla sin perder espacio útil del mapa. Se controla desde `herramientas.leyenda`:
+
+```js
+leyenda: {
+    plegable: true,          // Muestra la pestaña lateral.
+    colapsadaInicial: false  // true inicia con la leyenda escondida.
+}
+```
+
 ## Guía rápida de apariencia en `styles.css`
 
 `config/config.js` controla qué muestra y cómo se comporta el visor. `css/styles.css` controla su apariencia: colores, tamaños, espacios, bordes y adaptación a pantallas pequeñas. Para un visor normal no es necesario modificar los archivos JavaScript.

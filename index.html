@@ -158,8 +158,18 @@
 
 <!-- Leyenda dinámica de capas visibles -->
 <aside id="legend-content" class="map-legend" aria-label="Leyenda" hidden>
-    <div class="map-legend-title">Leyenda</div>
-    <div id="legend-list"></div>
+    <button
+        id="legend-toggle"
+        class="map-legend-toggle"
+        type="button"
+        title="Ocultar leyenda"
+        aria-label="Ocultar leyenda"
+        aria-expanded="true"
+    ></button>
+    <div class="map-legend-body">
+        <div class="map-legend-title">Leyenda</div>
+        <div id="legend-list"></div>
+    </div>
 </aside>
 
             <div class="map-navigation">

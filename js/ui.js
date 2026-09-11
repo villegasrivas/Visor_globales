@@ -419,6 +419,22 @@ appConfig.gruposCapas
 
 const legendContent = document.getElementById("legend-content");
 const legendList = document.getElementById("legend-list");
+const legendToggle = document.getElementById("legend-toggle");
+const legendUiConfig = appConfig.herramientas.leyenda || {};
+
+function setLegendCollapsed(collapsed) {
+    legendContent.classList.toggle("map-legend-collapsed", collapsed);
+    legendToggle.title = collapsed ? "Mostrar leyenda" : "Ocultar leyenda";
+    legendToggle.setAttribute("aria-label", legendToggle.title);
+    legendToggle.setAttribute("aria-expanded", String(!collapsed));
+}
+
+legendToggle.hidden = legendUiConfig.plegable === false;
+setLegendCollapsed(legendUiConfig.colapsadaInicial === true);
+legendToggle.addEventListener("click", function (event) {
+    event.stopPropagation();
+    setLegendCollapsed(!legendContent.classList.contains("map-legend-collapsed"));
+});
 
 /* La muestra usa la geometría real y separa la opacidad del borde y del relleno. */
 function createLegendSymbol(entry, geometry) {

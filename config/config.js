@@ -61,8 +61,12 @@ const appConfig = {
     ],
 
     /* Opciones generales de las herramientas del visor. */
-    herramientas: {
-        busqueda: {
+herramientas: {
+    leyenda: {
+        plegable: true,                     // Permite esconderla hacia la izquierda.
+        colapsadaInicial: false             // true inicia mostrando solo la pestaña.
+    },
+    busqueda: {
             enabled: true,                 // Muestra u oculta el buscador.
             minimoCaracteres: 2,
             maxResultados: 10,
