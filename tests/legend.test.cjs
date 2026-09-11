@@ -1,0 +1,172 @@
+/* Prueba de regresión sin dependencias: node tests/legend.test.cjs */
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
+
+class Element {
+    constructor(tag) {
+        this.tagName = tag;
+        this.attributes = {};
+        this.children = [];
+        this.style = { setProperty: (key, value) => { this.style[key] = value; } };
+        this.classList = { add: (name) => { this.className += " " + name; } };
+    }
+    setAttribute(key, value) { this.attributes[key] = String(value); }
+    removeAttribute(key) { delete this.attributes[key]; }
+    appendChild(child) { this.children.push(child); }
+}
+
+class Marker {
+    getIcon() { return { createIcon: () => new Element("img") }; }
+}
+class CircleMarker {}
+class Polyline {}
+class Polygon extends Polyline {}
+class Group {
+    constructor(layers) { this.layers = layers; }
+    eachLayer(callback) { this.layers.forEach(callback); }
+}
+
+const context = vm.createContext({
+    layerOpacityValues: {},
+    document: {
+        createElement: (tag) => new Element(tag),
+        createElementNS: (namespace, tag) => new Element(tag)
+    },
+    L: {
+        Marker, CircleMarker, Polyline, Polygon,
+        divIcon(options) { return options; }
+    },
+    escapeHtml(value) { return String(value); }
+});
+
+function loadFunctions(file, start, end) {
+    const source = fs.readFileSync(path.join(__dirname, "..", "js", file), "utf8");
+    const first = source.indexOf(start);
+    const last = source.indexOf(end, first);
+    assert.ok(first >= 0 && last > first, "Funciones de prueba encontradas");
+    vm.runInContext(source.slice(first, last), context);
+}
+
+loadFunctions("layers.js", "function normalizeUniqueValue", "function updateLayerOpacity");
+loadFunctions("layers.js", "function getLayerLegendSymbols", "function isLabelVisibleAtCurrentZoom");
+loadFunctions("ui.js", "function createLegendSymbol", "function updateLegend");
+
+const { getLayerLegendSymbols, getLegendEntries, createLegendSymbol, createLegendItem } = context;
+const types = getLayerLegendSymbols(new Group([
+    new Marker(), new Group([new Marker(), new CircleMarker(), new Polyline(), new Polygon()])
+]));
+assert.equal(types.map((item) => item.tipo).join(","), "marcador,punto,linea,poligono");
+assert.equal(getLayerLegendSymbols(new Group([])).length, 0);
+const marker = createLegendSymbol({}, types[0]);
+assert.equal(marker.children[0].tagName, "img");
+assert.equal(marker.children[0].className, "legend-marker-icon");
+
+function shape(style, type) {
+    return createLegendSymbol({ estilo: style }, { tipo: type }).children[0].children[0];
+}
+const line = shape({ color: "#ab1234", weight: 2, dashArray: "5 3", opacity: 0.4 }, "linea");
+assert.equal(line.attributes.stroke, "#ab1234");
+assert.equal(line.attributes.fill, "none");
+assert.equal(line.attributes["stroke-dasharray"], "5 3");
+assert.equal(line.attributes["stroke-opacity"], "0.4");
+assert.equal(shape({}, "linea").attributes["stroke-dasharray"], undefined);
+assert.equal(shape({ fillOpacity: 0 }, "poligono").attributes["fill-opacity"], "0");
+assert.equal(shape({ fill: false }, "poligono").attributes.fill, "none");
+assert.equal(shape({ stroke: false }, "poligono").attributes.stroke, "none");
+assert.equal(shape({ weight: 0 }, "linea").attributes["stroke-width"], "0");
+assert.equal(shape({}, "punto").tagName, "circle");
+assert.equal(createLegendSymbol(
+    { estilo: {} },
+    { tipo: "punto", forma: "cuadrado" }
+).children[0].children[0].tagName, "rect");
+assert.match(createLegendSymbol(
+    { estilo: {} },
+    { tipo: "punto", forma: "triangulo" }
+).children[0].children[0].attributes.d, /^M 14 3/);
+assert.match(createLegendSymbol(
+    { estilo: {} },
+    { tipo: "punto", forma: "cruz" }
+).children[0].children[0].attributes.d, /^M 11 3/);
+const halo = createLegendSymbol({ halo: { color: "white" }, estilo: { color: "navy" } }, { tipo: "linea" });
+assert.ok(halo.className.includes("legend-symbol-structural"));
+assert.equal(halo.style["--legend-line-color"], "navy");
+
+const unique = getLegendEntries({ simbologia: {
+    tipo: "valoresUnicos", estiloBase: { weight: 2 },
+    categorias: [{ valor: "A", estilo: { color: "red" } }, { valor: "B", estilo: { color: "blue" } }],
+    estiloDefault: { color: "gray" }
+} }, "linea");
+assert.equal(unique.length, 3);
+assert.equal(shape(unique[1].estilo, "linea").attributes.stroke, "blue");
+assert.equal(shape(unique[1].estilo, "linea").attributes["stroke-width"], "2");
+const graduated = getLegendEntries({ simbologia: {
+    tipo: "graduados", estiloBase: { fillOpacity: 0.6 },
+    clases: [{ etiqueta: "0–10", estilo: { fillColor: "green" } }],
+    mostrarDefaultEnLeyenda: false
+} }, "poligono");
+assert.equal(graduated.length, 1);
+assert.equal(shape(graduated[0].estilo, "poligono").attributes.fill, "green");
+const mixed = createLegendItem({ etiqueta: "Mixta" }, types);
+assert.equal(mixed.children[0].children.length, 4);
+assert.equal(mixed.children[1].textContent, "Mixta");
+
+const lineFromPolygonStyle = context.getFeatureStyle(
+    { geometry: { type: "LineString" }, properties: { TIPO: "A" } },
+    {
+        id: "lineas",
+        simbologia: {
+            tipo: "valoresUnicos",
+            campo: "TIPO",
+            estiloBase: { color: "white", weight: 2, fillOpacity: 0.5 },
+            categorias: [{ valor: "A", estilo: { fillColor: "red" } }]
+        }
+    }
+);
+assert.equal(lineFromPolygonStyle.color, "red");
+assert.equal(lineFromPolygonStyle.fill, false);
+assert.equal(lineFromPolygonStyle.fillColor, undefined);
+assert.equal(context.shouldRenderFeature(
+    { properties: { TIPO: "B" } },
+    { simbologia: { tipo: "valoresUnicos", campo: "TIPO", mostrarNoConfigurados: false,
+        categorias: [{ valor: "A" }] } }
+), false);
+assert.equal(context.shouldUseCirclePointSymbol(
+    { simbologia: { tipo: "graduados" } }
+), true);
+assert.equal(context.shouldUseCirclePointSymbol(
+    { simbologia: { tipo: "simple" } }
+), true);
+assert.equal(context.shouldUseCirclePointSymbol(
+    { simbologia: { tipo: "graduados", simboloPunto: "marcador" } }
+), false);
+assert.equal(context.shouldUseCirclePointSymbol(
+    { simbologia: { tipo: "simple", simboloPunto: "triangulo" } }
+), false);
+assert.equal(context.getPointSymbolType(
+    { simbologia: { tipo: "simple", simboloPunto: "cruz" } }
+), "cruz");
+const triangleIcon = context.createPointSymbolIcon(
+    { color: "#ffffff", fillColor: "#123456", radius: 8, weight: 2 },
+    "triangulo"
+);
+assert.match(triangleIcon.html, /<path d="M /);
+assert.match(triangleIcon.html, /fill="#123456"/);
+const lineHighlight = context.getFeatureInteractionStyle(
+    { geometry: { type: "MultiLineString" } },
+    { color: "white", fillColor: "orange", weight: 6, opacity: 1, fillOpacity: 0.45 },
+    "seleccionado"
+);
+assert.equal(lineHighlight.color, "orange");
+assert.equal(lineHighlight.opacity, 1);
+assert.equal(lineHighlight.fillColor, undefined);
+const dimmedLine = context.getFeatureInteractionStyle(
+    { geometry: { type: "LineString" } },
+    { fillOpacity: 0.25 },
+    "resto"
+);
+assert.equal(dimmedLine.opacity, 0.25);
+assert.equal(context.getMarkerInteractionOpacity({ fillOpacity: 0 }, "seleccionado"), 1);
+assert.equal(context.getMarkerInteractionOpacity({ fillOpacity: 0.25 }, "resto"), 0.25);
+console.log("Leyenda: geometrías, marcadores, líneas, transparencia, halo y categorías OK.");
