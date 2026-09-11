@@ -1638,16 +1638,28 @@ body {
         --header-height: 56px;
     }
 
-    .brand-secondary {
+    .brand-text {
         display: none;
     }
 
-    .brand-main {
-        font-size: 13px;
+    .brand {
+        flex-shrink: 0;
     }
 
     .viewer-title {
-        display: none;
+        display: -webkit-box;
+        flex: 1;
+        min-width: 0;
+        margin-left: 10px;
+        overflow: hidden;
+        color: var(--color-text-light);
+        font-size: 13px;
+        line-height: 1.15;
+        max-height: 2.3em;
+        text-align: left;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
     }
 
     .search-container {

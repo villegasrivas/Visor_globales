@@ -27,7 +27,7 @@ const appConfig = {
             tipo: "",                 // "capa" o "centro".
             capaId: "limiteComunal",      // Se usa cuando tipo es "capa".
             centro: [-38.74, -72.95],      // Respaldo o vista de tipo "centro".
-            zoom: 11,
+            zoom: 10,
             padding: [20, 20]   // Espacio en píxeles entre el borde del mapa y la vista inicial.
         },
         zoomMin: 8,
