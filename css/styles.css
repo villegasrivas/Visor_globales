@@ -331,6 +331,72 @@ body {
     font-size: 13px;
 }
 
+/* Selector compacto de herramientas para pantallas pequeñas. */
+.mobile-tools-toggle {
+    display: none;
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 1100;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-primary);
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    box-shadow: var(--shadow-control);
+    cursor: pointer;
+}
+
+.mobile-tools-glyph {
+    font-size: 21px;
+    line-height: 1;
+}
+
+.mobile-tools-toggle:hover,
+.mobile-tools-toggle:focus-visible,
+.mobile-tools-toggle-active {
+    background-color: var(--color-accent);
+}
+
+.mobile-tools-toggle[hidden],
+.map-tools[hidden] {
+    display: none;
+}
+
+.map-container.mobile-tools-mode .mobile-tools-toggle {
+    display: flex;
+}
+
+.map-container.mobile-tools-mode .map-tools {
+    right: 12px;
+    bottom: 64px;
+    width: min(220px, calc(100% - 24px));
+    max-height: calc(100% - 80px);
+    padding: 7px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    box-shadow: var(--shadow-control);
+}
+
+.map-container.mobile-tools-mode .map-tools .tool-button {
+    width: 100%;
+    padding: 9px 11px;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.map-container.mobile-tools-mode .map-tools .tool-label {
+    display: inline;
+}
+
 /* Destino para Google Maps; no se calcula la ruta dentro del visor. */
 .google-maps-menu {
     position: absolute;

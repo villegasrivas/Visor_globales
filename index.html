@@ -213,7 +213,7 @@
             </div>
 
             <!-- Herramientas configurables -->
-            <div class="map-tools">
+            <div id="map-tools" class="map-tools">
 
                 <button
                     id="geolocation-button"
@@ -260,6 +260,11 @@
 
             </div>
 
+            <button id="mobile-tools-toggle" class="mobile-tools-toggle" type="button" title="Herramientas"
+                aria-label="Abrir herramientas" aria-controls="map-tools" aria-expanded="false" hidden>
+                <span class="mobile-tools-glyph" aria-hidden="true">🛠</span>
+            </button>
+
         </main>
 
     </div>
@@ -290,6 +295,8 @@
 <script src="js/google-maps.js"></script>
 
 <script src="js/downloads.js"></script>
+
+<script src="js/mobile-tools.js"></script>
 
 </body>
 
