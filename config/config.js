@@ -183,6 +183,7 @@ herramientas: {
             minZoom: null, // Zoom mínimo visible; null sin límite.
             maxZoom: null, // Zoom máximo visible; null sin límite.
             opacityControl: false, // Muestra el control de transparencia.
+            opacityTarget: "fill", // "fill": solo relleno de polígonos, conserva el borde. "all": relleno y borde (valor por defecto si se omite). Puntos y líneas conservan su comportamiento.
             cluster: false, // Agrupa puntos cercanos.
             interactive: true, // Permite interacción con las entidades.
 
@@ -266,6 +267,7 @@ herramientas: {
             minZoom: null, // Zoom mínimo visible; null sin límite.
             maxZoom: null, // Zoom máximo visible; null sin límite.
             opacityControl: true, // Muestra el control de transparencia.
+            opacityTarget: "fill", // "fill": solo relleno de polígonos, conserva el borde. "all": relleno y borde (valor por defecto si se omite). Puntos y líneas conservan su comportamiento.
             cluster: false, // Agrupa puntos cercanos.
             interactive: true, // Permite interacción con las entidades.
 
@@ -361,6 +363,7 @@ herramientas: {
     minZoom: null, // Zoom mínimo visible; null sin límite.
     maxZoom: null, // Zoom máximo visible; null sin límite.
     opacityControl: true, // Muestra el control de transparencia.
+    opacityTarget: "fill", // "fill": solo relleno de polígonos, conserva el borde. "all": relleno y borde (valor por defecto si se omite). Puntos y líneas conservan su comportamiento.
     cluster: false, // Agrupa puntos cercanos.
     interactive: true, // Permite interacción con las entidades.
 
@@ -451,6 +454,7 @@ herramientas: {
     minZoom: null, // Zoom mínimo visible; null sin límite.
     maxZoom: null, // Zoom máximo visible; null sin límite.
     opacityControl: false, // Muestra el control de transparencia.
+    opacityTarget: "fill", // "fill": solo relleno de polígonos, conserva el borde. "all": relleno y borde (valor por defecto si se omite). Puntos y líneas conservan su comportamiento.
     cluster: true, // Agrupa puntos cercanos.
     interactive: true, // Permite interacción con las entidades.
 
@@ -553,6 +557,7 @@ herramientas: {
     minZoom: null, // Zoom mínimo visible; null sin límite.
     maxZoom: null, // Zoom máximo visible; null sin límite.
     opacityControl: true, // Muestra el control de transparencia.
+    opacityTarget: "fill", // "fill": solo relleno de polígonos, conserva el borde. "all": relleno y borde (valor por defecto si se omite). Puntos y líneas conservan su comportamiento.
     cluster: false, // Agrupa puntos cercanos.
     interactive: true, // Permite interacción con las entidades.
 
@@ -768,6 +773,7 @@ Copie este objeto dentro de appConfig.capas y complete sus valores.
     minZoom: null,                         // Zoom mínimo visible; null sin límite.
     maxZoom: null,                         // Zoom máximo visible; null sin límite.
     opacityControl: true,                  // Muestra el control de transparencia.
+    opacityTarget: "fill", // "fill": solo relleno de polígonos, conserva el borde. "all": relleno y borde (valor por defecto si se omite). Puntos y líneas conservan su comportamiento.
     cluster: false,                        // Use true solamente en capas de puntos.
     interactive: true,                     // Permite interacción con las entidades.
 
